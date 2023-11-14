@@ -64,7 +64,6 @@ class KeywordSpider(scrapy.Spider):
 
     def parse_keyword(self, response):
         raw_ads = self.get_raw_page(response)
-        self.logger.info(raw_ads)
 
         if not raw_ads:
             self.logger.error(f'Temporarily blocked when scraping store {response.meta["keyword"]["keyword"]} in {response.meta["keyword"]["country"]}')
@@ -76,19 +75,16 @@ class KeywordSpider(scrapy.Spider):
             )
             return new_request_or_none
 
-
         total_ads = self.get_total_ads(raw_ads)
         self.logger.info(f'{total_ads} ads found for {response.meta["keyword"]["keyword"]} in {response.meta["keyword"]["country"]}')
 
-        product_urls = []
+        store_urls = []
         for raw_ad in raw_ads['payload']['results']:
-            product_url = raw_ad[0]['snapshot']['link_url']
-            if product_url not in product_urls:
-                product_urls.append(product_url)
+            store_url = raw_ad[0]['snapshot']['link_url'].split('/')[2] if raw_ad[0]['snapshot']['link_url'] else None
+            if store_url and store_url not in store_urls:
+                store_urls.append(store_url)
 
-        for product_url in product_urls:
-            self.logger.info(f'Found product url: {product_url}')
-        yield product_urls
+        yield {'keyword': response.meta['keyword']['keyword'], 'country': response.meta['keyword']['country'], 'store_urls': store_urls}
 
     def get_raw_page(self, response):
         try:
