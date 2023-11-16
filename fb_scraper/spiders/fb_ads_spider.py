@@ -12,6 +12,7 @@ from w3lib.url import add_or_replace_parameter, add_or_replace_parameters
 
 from ..helpers.get_data import get_keywords
 from ..items import DomainItem, KeywordItem
+from ..helpers.send_to_storeleads import send
 
 
 class KeywordSpider(scrapy.Spider):
@@ -84,7 +85,8 @@ class KeywordSpider(scrapy.Spider):
             if store_url and store_url not in store_urls:
                 store_urls.append(store_url)
 
-        yield {'keyword': response.meta['keyword']['keyword'], 'country': response.meta['keyword']['country'], 'store_urls': store_urls}
+        request = send(store_urls, response.meta['keyword']['keyword'], response.meta['keyword']['country'], self)
+        yield request
 
     def get_raw_page(self, response):
         try:
