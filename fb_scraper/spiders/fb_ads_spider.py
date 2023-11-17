@@ -1,8 +1,5 @@
-import html
 import json
-import random
 import string
-from datetime import datetime
 from urllib.parse import urlencode
 import random
 
@@ -10,8 +7,8 @@ import scrapy
 from scrapy.downloadermiddlewares.retry import get_retry_request
 from w3lib.url import add_or_replace_parameter, add_or_replace_parameters
 
-from ..helpers.get_data import get_keywords
-from ..items import DomainItem, KeywordItem
+from ..helpers.get_data import get_country_keyword_combinations
+from ..items import KeywordItem
 from ..helpers.send_to_storeleads import send
 
 
@@ -48,12 +45,13 @@ class KeywordSpider(scrapy.Spider):
 
     def start_requests(self):
         lsd_token = self.generate_lsd_token()
-        while True:
-            keywords = get_keywords()
+
+        for country, keyword in get_country_keyword_combinations():
             keyword_item = KeywordItem()
-            keyword_item['country'] = random.choice(list(keywords.keys()))
-            keyword_item['keyword'] = random.choice(keywords[keyword_item['country']])
-            parameters = {**self.parameters, 'q': f'"{keyword_item["keyword"]}"', 'country': f'"{keyword_item["country"]}"', 'search_type': 'keyword_unordered'}
+            keyword_item['country'] = country
+            keyword_item['keyword'] = keyword
+            parameters = {**self.parameters, 'q': f'"{keyword_item["keyword"]}"',
+                          'country': f'"{keyword_item["country"]}"', 'search_type': 'keyword_unordered'}
             headers = {**self.headers, 'x-fb-lsd': lsd_token}
             payload = {**self.payload, 'lsd': lsd_token}
             url = add_or_replace_parameters(self.search_url, parameters)
@@ -89,9 +87,9 @@ class KeywordSpider(scrapy.Spider):
             if store_url and store_url not in store_urls:
                 store_urls.append(store_url)
 
-        store_leads_request = send(store_urls, response.meta['keyword']['keyword'],
-                                   response.meta['keyword']['country'], self)
-        yield store_leads_request
+        # store_leads_request = send(store_urls, response.meta['keyword']['keyword'],
+        #                            response.meta['keyword']['country'], self)
+        # yield store_leads_request
 
         forward_cursor = raw_ads['payload'].get('forwardCursor')
         if not forward_cursor:
@@ -113,7 +111,11 @@ class KeywordSpider(scrapy.Spider):
 
     def get_raw_page(self, response):
         try:
-            return json.loads(response.text.replace('for (;;);', ''))
+            raw_page = json.loads(response.text.replace('for (;;);', ''))
+            if not raw_page.get('payload'):
+                return {}
+
+            return raw_page
         except:
             return {}
 
