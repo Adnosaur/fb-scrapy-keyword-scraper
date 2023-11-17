@@ -1,7 +1,5 @@
-# Define here the models for your spider middleware
-#
-# See documentation in:
-# https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import random
+from urllib.parse import urlparse
 
 from scrapy import signals
 
@@ -106,3 +104,21 @@ class FbScraperDownloaderMiddleware:
 class CustomDownloadMiddleware(object):
     def process_request(self, request, spider):
         del request.headers['Accept-Language']
+
+
+class AddProxyMiddleware(object):
+
+    def process_request(self, request, spider):
+        # a list containing our proxy pool
+        possible_proxies = getattr(spider, "possible_proxies", None)
+
+        # a list of domains that will run on proxy to only run on blocking domains and save cost
+        proxy_domains = getattr(spider, "proxy_domains", None)
+        parsed_url = urlparse(request.url)
+        request_url_domain = parsed_url.netloc
+        if not possible_proxies or request_url_domain not in proxy_domains:
+            return
+
+        proxy = random.choice(possible_proxies)
+        spider.log("Using proxy: {0}".format(proxy))
+        request.meta["proxy"] = proxy

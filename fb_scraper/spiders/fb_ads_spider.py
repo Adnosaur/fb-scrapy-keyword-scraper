@@ -36,6 +36,10 @@ class KeywordSpider(scrapy.Spider):
         'media_type': 'all',
         'search_type': 'keyword_exact_phrase'
     }
+    # possible_proxies = [
+    #     'http://Poas12ik:z8ai12PP@169.197.83.74:6039',
+    # ]
+    proxy_domains = ['www.facebook.com']
 
     def generate_lsd_token(self):
         characters = list(string.ascii_lowercase + string.ascii_uppercase + string.digits)
@@ -85,8 +89,27 @@ class KeywordSpider(scrapy.Spider):
             if store_url and store_url not in store_urls:
                 store_urls.append(store_url)
 
-        request = send(store_urls, response.meta['keyword']['keyword'], response.meta['keyword']['country'], self)
-        yield request
+        store_leads_request = send(store_urls, response.meta['keyword']['keyword'],
+                                   response.meta['keyword']['country'], self)
+        yield store_leads_request
+
+        forward_cursor = raw_ads['payload'].get('forwardCursor')
+        if not forward_cursor:
+            self.logger.info(f'Last Page Reached for {response.meta["keyword"]["keyword"]} in {response.meta["keyword"]["country"]}')
+            return
+
+        url = add_or_replace_parameter(response.url, 'forward_cursor', forward_cursor)
+        url = add_or_replace_parameter(url, 'collation_token', raw_ads['payload']['collationToken'])
+        self.logger.info(
+            f'PAGINATION: For {response.meta["keyword"]["keyword"]} in {response.meta["keyword"]["country"]}')
+        yield scrapy.Request(
+            url,
+            self.parse_keyword,
+            body=response.request.body.decode(),
+            headers=response.request.headers,
+            method='POST',
+            meta=response.meta
+        )
 
     def get_raw_page(self, response):
         try:

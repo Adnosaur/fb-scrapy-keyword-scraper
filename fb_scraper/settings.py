@@ -52,6 +52,7 @@ DOWNLOAD_DELAY = 3
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    'fb_scraper.middlewares.CustomDownloadMiddleware': 543,
+   'fb_scraper.middlewares.AddProxyMiddleware': 600,
 }
 
 # Enable or disable extensions
