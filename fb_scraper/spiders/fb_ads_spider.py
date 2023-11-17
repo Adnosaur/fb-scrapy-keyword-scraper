@@ -87,9 +87,9 @@ class KeywordSpider(scrapy.Spider):
             if store_url and store_url not in store_urls:
                 store_urls.append(store_url)
 
-        # store_leads_request = send(store_urls, response.meta['keyword']['keyword'],
-        #                            response.meta['keyword']['country'], self)
-        # yield store_leads_request
+        store_leads_request = send(store_urls, response.meta['keyword']['keyword'],
+                                   response.meta['keyword']['country'], self)
+        yield store_leads_request
 
         forward_cursor = raw_ads['payload'].get('forwardCursor')
         if not forward_cursor:
