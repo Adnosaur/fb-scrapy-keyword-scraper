@@ -33,9 +33,9 @@ class KeywordSpider(scrapy.Spider):
         'media_type': 'all',
         'search_type': 'keyword_exact_phrase'
     }
-    # possible_proxies = [
-    #     'http://Poas12ik:z8ai12PP@169.197.83.74:6039',
-    # ]
+    possible_proxies = [
+        'http://customer-adnosaur:8nd7hUAzt4mjU@pr.oxylabs.io:7777',
+    ]
     proxy_domains = ['www.facebook.com']
 
     def generate_lsd_token(self):
@@ -69,17 +69,20 @@ class KeywordSpider(scrapy.Spider):
         raw_ads = self.get_raw_page(response)
 
         if not raw_ads:
-            self.logger.error(f'Temporarily blocked when scraping store {response.meta["keyword"]["keyword"]} in {response.meta["keyword"]["country"]}')
+            self.logger.error(f'Temporarily blocked when scraping store {response.meta["keyword"]["keyword"]}'
+                              f' in {response.meta["keyword"]["country"]}')
             # added the default retry for now
             new_request_or_none = get_retry_request(
                 response.request,
                 spider=self,
                 reason='empty',
             )
-            return new_request_or_none
+            yield new_request_or_none
+            return
 
         total_ads = self.get_total_ads(raw_ads)
-        self.logger.info(f'{total_ads} ads found for {response.meta["keyword"]["keyword"]} in {response.meta["keyword"]["country"]}')
+        self.logger.info(f'{total_ads} ads found for {response.meta["keyword"]["keyword"]} '
+                         f'in {response.meta["keyword"]["country"]}')
 
         store_urls = []
         for raw_ad in raw_ads['payload']['results']:
@@ -93,7 +96,8 @@ class KeywordSpider(scrapy.Spider):
 
         forward_cursor = raw_ads['payload'].get('forwardCursor')
         if not forward_cursor:
-            self.logger.info(f'Last Page Reached for {response.meta["keyword"]["keyword"]} in {response.meta["keyword"]["country"]}')
+            self.logger.info(f'Last Page Reached for {response.meta["keyword"]["keyword"]}'
+                             f' in {response.meta["keyword"]["country"]}')
             return
 
         url = add_or_replace_parameter(response.url, 'forward_cursor', forward_cursor)
