@@ -8,7 +8,3 @@ import scrapy
 
 class DomainItem(scrapy.Item):
     domain = scrapy.Field()
-
-class KeywordItem(scrapy.Item):
-    keyword = scrapy.Field()
-    country = scrapy.Field()

@@ -25,7 +25,7 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 6
+DOWNLOAD_DELAY = 5
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -99,3 +99,4 @@ AWS_ENDPOINT_URL = f'https://{AWS_REGION_NAME}.digitaloceanspaces.com'
 AWS_ACCESS_KEY_ID = 'DO004XMBEGWC4ZD2YQFF'
 AWS_SECRET_ACCESS_KEY = 'ScsD/NkudbdMvX5ufLcFS0p2V1lLFddQ08exJIIpZ64'
 FILES_STORE_S3_ACL = IMAGES_STORE_S3_ACL = 'public-read'
+DUPEFILTER_CLASS = 'scrapy.dupefilters.BaseDupeFilter'

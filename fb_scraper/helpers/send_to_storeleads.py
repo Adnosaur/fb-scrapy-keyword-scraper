@@ -11,20 +11,21 @@ def connect():
     return url, headers
 
 
-def send(store_urls_item, keyItem, countryItem, spider):
+def send(store_urls_item, keyword_params, spider):
     url, headers = connect()
 
     data = {'domains': store_urls_item}
     store_urls_count = len(store_urls_item)
     request = scrapy.Request(url, method='PUT', headers=headers, body=json.dumps(data), callback=parse_response,
-                             cb_kwargs={'spider': spider, 'store_urls_count': store_urls_count, 'keyItem': keyItem,
-                                        'countryItem': countryItem})
+                             cb_kwargs={'spider': spider, 'store_urls_count': store_urls_count,
+                                        'keyword_params': keyword_params})
     return request
 
 
-def parse_response(response, spider, store_urls_count, keyItem, countryItem):
+def parse_response(response, spider, store_urls_count, keyword_params):
     if response.status == 200:
         spider.logger.info(f'RESPONSE: {response.json()}')
-        spider.logger.info(f'Successfully sent {store_urls_count} domain names to StoreLeads for {keyItem} in {countryItem}')
+        spider.logger.info(f'Successfully sent {store_urls_count} domain names to StoreLeads for '
+                           f'{json.dumps(keyword_params)}')
     else:
-        spider.logger.error(f'Failed to send data to StoreLeads for {keyItem} in {countryItem}')
+        spider.logger.error(f'Failed to send data to StoreLeads for {json.dumps(keyword_params)}')
