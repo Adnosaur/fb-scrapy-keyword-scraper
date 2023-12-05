@@ -33,7 +33,9 @@ class KeywordSpider(scrapy.Spider):
         'search_type': 'keyword_exact_phrase'
     }
     possible_proxies = [
-        'http://customer-adnosaur:8nd7hUAzt4mjU@pr.oxylabs.io:7777',
+        # 'http://customer-adnosaur:8nd7hUAzt4mjU@pr.oxylabs.io:7777',
+        'http://proxy:O7wZ1J7@easyport-alt.mobilehop.com:38382',
+        'http://proxy:O7wZ1J7@easyport.mobilehop.com:38382'
     ]
     proxy_domains = ['www.facebook.com']
     unique_stores_found = set()

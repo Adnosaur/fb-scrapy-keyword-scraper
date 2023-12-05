@@ -1,11 +1,5 @@
-# Scrapy settings for fb_scraper project
-#
-# For simplicity, this file contains only settings considered important or
-# commonly used. You can find more settings consulting the documentation:
-#
-#     https://docs.scrapy.org/en/latest/topics/settings.html
-#     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+from datetime import datetime
+
 
 BOT_NAME = 'fb_scraper'
 
@@ -100,3 +94,4 @@ AWS_ACCESS_KEY_ID = 'DO004XMBEGWC4ZD2YQFF'
 AWS_SECRET_ACCESS_KEY = 'ScsD/NkudbdMvX5ufLcFS0p2V1lLFddQ08exJIIpZ64'
 FILES_STORE_S3_ACL = IMAGES_STORE_S3_ACL = 'public-read'
 DUPEFILTER_CLASS = 'scrapy.dupefilters.BaseDupeFilter'
+LOG_FILE = f'logs/scrapy_{datetime.now().strftime("%Y%m%d%H%M%S")}.log'
